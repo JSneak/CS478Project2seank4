@@ -1,6 +1,8 @@
 package com.example.cs478project2seank4;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,18 +20,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
-    private ArrayList<String> nameList; //data: the names displayed
+//    private ArrayList<String> nameList; //data: the names displayed
     private RVClickListener RVlistener; //listener defined in main activity
+    private MenuItem.OnMenuItemClickListener OpenVideoListener;
+    private MenuItem.OnMenuItemClickListener OpenMovieWikiListener;
+    private MenuItem.OnMenuItemClickListener OpenDirectorWikiListener;
     private Context context;
 
-    /*
-    passing in the data and the listener defined in the main activity
-     */
-    public MyAdapter(ArrayList<String> theList, RVClickListener listener){
-        nameList = theList;
-        this.RVlistener = listener;
+    private ArrayList<String> movieTitles;
+    private ArrayList<String> movieDirectors;
+    private ArrayList<Integer> movieThumbnails;
 
+
+    /* passing in the data and the listener defined in the main activity */
+    public MyAdapter(ArrayList<String> mtList, ArrayList<String> mdList, ArrayList<Integer> mthmbnailList, RVClickListener listener, MenuItem.OnMenuItemClickListener menuListener1, MenuItem.OnMenuItemClickListener menuListener2, MenuItem.OnMenuItemClickListener menuListener3) {
+        movieTitles = mtList;
+        movieDirectors = mdList;
+        movieThumbnails = mthmbnailList;
+
+        this.RVlistener = listener;
+        this.OpenVideoListener = menuListener1;
+        this.OpenMovieWikiListener = menuListener2;
+        this.OpenDirectorWikiListener = menuListener3;
     }
+
+
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,20 +53,24 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View listView = inflater.inflate(R.layout.rv_item, parent, false);
-        ViewHolder viewHolder = new ViewHolder(listView, RVlistener);
+        ViewHolder viewHolder = new ViewHolder(listView, RVlistener, OpenVideoListener, OpenMovieWikiListener, OpenDirectorWikiListener);
 
         return viewHolder;
     }
 
+
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.title.setText(nameList.get(position));
-
+        holder.title.setText(movieTitles.get(position));
+        holder.director.setText(movieDirectors.get(position));
+        holder.thumbnail.setImageResource(movieThumbnails.get(position));
+        holder.pos = holder.getAdapterPosition();
     }
 
     @Override
     public int getItemCount() {
-        return nameList.size();
+        return movieTitles.size();
     }
 
 
@@ -65,24 +86,30 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
         public TextView title;
         public TextView director;
-        public ImageView image;
+        public ImageView thumbnail;
+        public int pos;
         private RVClickListener listener;
+        private MenuItem.OnMenuItemClickListener openVListener;
+        private MenuItem.OnMenuItemClickListener openWListener;
+        private MenuItem.OnMenuItemClickListener openDListener;
         private View itemView;
 
 
-        public ViewHolder(@NonNull View itemView, RVClickListener passedListener) {
+        public ViewHolder(@NonNull View itemView, RVClickListener passedListener, MenuItem.OnMenuItemClickListener menuListener1, MenuItem.OnMenuItemClickListener menuListener2, MenuItem.OnMenuItemClickListener menuListener3) {
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.title_TextView);
             director = (TextView) itemView.findViewById(R.id.director_TextView);
-            image = (ImageView) itemView.findViewById(R.id.imageView);
-            /*
-                TODO:   Change name to title, add director TextView
-                        Make sure that title is bigger than director, director should be italicized
-             */
+            thumbnail = (ImageView) itemView.findViewById(R.id.mv_imageView);
+
+            /* Need to figure out how to set a menu item for the fucking parent */
+
+
             this.itemView = itemView;
             itemView.setOnCreateContextMenuListener(this); //set context menu for each list item (long click)
             this.listener = passedListener;
-
+            this.openVListener = menuListener1;
+            this.openWListener = menuListener2;
+            this.openDListener = menuListener3;
 
             /*
                 don't forget to set the listener defined here to the view (list item) that was
@@ -99,40 +126,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-
-            //inflate menu from xml
-
-            MenuInflater inflater = new MenuInflater(v.getContext());
-            inflater.inflate(R.menu.context_menu, menu );
-            menu.getItem(0).setOnMenuItemClickListener(onMenu);
-            menu.getItem(1).setOnMenuItemClickListener(onMenu);
-            menu.getItem(2).setOnMenuItemClickListener(onMenu);
-            menu.getItem(3).setOnMenuItemClickListener(onMenu);
-
-          /*  //create menu in code
-
-            menu.setHeaderTitle("My context menu");
+            //menu.setHeaderTitle("My context menu");
 
             //add menu items and set the listener for each
-            menu.add(0,v.getId(),0,"option 1").setOnMenuItemClickListener(onMenu);
-            menu.add(0,v.getId(),0,"option 2").setOnMenuItemClickListener(onMenu);
-            menu.add(0,v.getId(),0,"option 3").setOnMenuItemClickListener(onMenu);
-            */
-
+            Log.i("Create Menu", "Get Id: " + v.getId());
+            menu.add(pos, v.getId(), 0, "View video clip").setOnMenuItemClickListener(openVListener);
+            menu.add(pos, v.getId(), 1, "View wiki page").setOnMenuItemClickListener(openWListener);
+            menu.add(pos, v.getId(), 2, "View director page").setOnMenuItemClickListener(openDListener);
         }
-
-        /*
-            listener for menu items clicked
-         */
-        private final MenuItem.OnMenuItemClickListener onMenu = new MenuItem.OnMenuItemClickListener(){
-            @Override
-            public boolean onMenuItemClick(MenuItem item){
-                Log.i("ON_CLICK", title.getText() + " adapter pos: " + getAdapterPosition());
-                return true;
-            }
-        };
-
-
-
     }
 }

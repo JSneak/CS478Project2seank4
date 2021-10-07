@@ -7,30 +7,33 @@
     android:padding="10dp">
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:id="@+id/mv_imageView"
+        android:layout_width="250px"
+        android:layout_height="250px"
         android:background="@color/purple_200"
         android:layout_gravity="center_horizontal"
+        android:scaleType="centerCrop"
         app:srcCompat="@mipmap/ic_launcher" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="8px">
 
         <TextView
             android:id="@+id/title_TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="example_movie"
-            android:textSize="20sp" />
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/director_TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="example_director"
+            android:textSize="10sp"
             android:textStyle="italic" />
 
     </LinearLayout>
