@@ -20,6 +20,10 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    /* Sean Kim
+        seank4@uic.edu
+     */
+
     ArrayList<String> mvTitleList;
     ArrayList<String> mvDirectorList;
     ArrayList<String> mvPreviewList;
